@@ -7,17 +7,23 @@ export const login = async(req: express.Request, res: express.Response) => {
   try{
     const { email, password } = req.body
 
-    if(!email || !password) {
+    if (!email || !password) {
       return res.sendStatus(400)
     }
 
     const user = await getUserByEmail(email)
 
-    if(!user) {
+    if (!user) {
       return res.sendStatus(400)
     }
 
-    const expectedHash = authentication(user.authentication?.salt, password)
+
+
+    const expectedHash = authentication(user.authentication?.salt ?? '', password)
+
+    if(user.authentication?.password !== expectedHash) {
+      return res.sendStatus(403)
+    }
 
 
   } catch (error){
